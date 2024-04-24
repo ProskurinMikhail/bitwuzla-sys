@@ -1,0 +1,1 @@
+#include "bitwuzla/include/bitwuzla/c/bitwuzla.h"

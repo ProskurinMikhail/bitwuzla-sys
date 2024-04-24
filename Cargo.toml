@@ -1,0 +1,13 @@
+[package]
+name = "bindgen-autobitwuzla"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bitwuzla-sys = "0.2.0"
+
+[build-dependencies]
+bindgen = "0.69.4"
+copy_dir = { version = "0.1.2", optional = false }
