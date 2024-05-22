@@ -25,8 +25,7 @@ fn main() {
     }
 
     let old = env::var("PKG_CONFIG_PATH");
-    let pkg_config_dir: PathBuf = dir_bitwuzla.join("build/meson-uninstalled");  // --prefix path
-
+    let pkg_config_dir: PathBuf = dir_bitwuzla.join("build/meson-uninstalled"); // --prefix path
 
     match old {
         Ok(ref s) => {

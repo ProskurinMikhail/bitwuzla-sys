@@ -1,45 +1,30 @@
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
+mod generalized;
 
+use generalized::{bitwuzla_sys, BitwuzlaConvertor};
 use std::ffi::{c_char, CStr, CString};
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+use crate::generalized::{BitwuzlaSort, BitwuzlaTerm, GeneralConvertor};
 
 fn main() {
-    unsafe {
-        let mut tm = bitwuzla_term_manager_new();
+    let bc = BitwuzlaConvertor::new();
 
-        let mut options = bitwuzla_options_new();
+    let mut sortbv4 = bc.mk_bv_sort(4);
 
-        let cadical_cstr = CString::new("cadical").unwrap();
+    let mut sortbv3 = bc.mk_bv_sort(3);
 
-        bitwuzla_set_option(options, BitwuzlaOption_BITWUZLA_OPT_PRODUCE_MODELS, 1);
-        bitwuzla_set_option_mode(
-            options,
-            BitwuzlaOption_BITWUZLA_OPT_SAT_SOLVER,
-            cadical_cstr.as_ptr() as *const i8,
-        );
-        let mut bitwuzla = bitwuzla_new(tm, options);
+    //let bsortbv4 = sortbv4; //BitwuzlaSort { sort: sortbv4.sort };
 
-        let x_cstr = CString::new("x").unwrap();
+    let mut x = bc.mk_smt_symbol("x", &sortbv4);
 
-        let mut sortbv4 = bitwuzla_mk_bv_sort(tm, 4);
-        let mut x = bitwuzla_mk_const(tm, sortbv4, x_cstr.as_ptr() as *const i8);
+    let mut y = bc.mk_bv_value_uint64(&sortbv3, 2);
 
-        bitwuzla_assert(
-            bitwuzla,
-            bitwuzla_mk_term2(
-                tm,
-                BitwuzlaKind_BITWUZLA_KIND_EQUAL,
-                x,
-                bitwuzla_mk_bv_value_uint64(tm, sortbv4, 2),
-            ),
-        );
-        let mut result = bitwuzla_check_sat(bitwuzla);
-        println!("Expect: sat\n");
+    let mut t = bc.mk_eq(&x, &y);
 
-        let res_str = CStr::from_ptr(bitwuzla_result_to_string(result));
-        println!("Bitwuzla: {}\n", res_str.to_str().unwrap());
-    }
+    bc.assert(&t);
+
+    let mut result = bc.check_sat();
+
+    println!("Expect: sat");
+
+    println!("Bitwuzla: {}", result);
 }
